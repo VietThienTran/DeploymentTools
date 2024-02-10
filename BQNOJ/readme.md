@@ -5,7 +5,7 @@ Với Docker, quá trình cài đặt của bạn sẽ giảm thiểu được x
 
 ✅ OS: Ubuntu 20.04 trở lên
 
-✅ Storage: 20GB trở lên
+✅ Storage: 20 GB trở lên
 
 ✅ CPU: 1 core trở lên
 
@@ -13,7 +13,7 @@ Với Docker, quá trình cài đặt của bạn sẽ giảm thiểu được x
 
 Tùy theo thực tế và nhu cầu sử dụng, cấu hình và các thông số có thể thay đổi. Ở đây, mình sử dụng 02 máy với cấu hình như sau: 
 
-* Máy chủ (tạm gọi là Local Server) - Cài đặt webserver và chạy 02 máy chấm song song (judge):
+* Máy chủ (tạm gọi là Local Server) - Cài đặt webserver và chạy 02 máy chấm song song (judge01 và judge02)
    
 ✅ Ubuntu 22.04 Server/2 Core/4 GB RAM/60 GB SSD
 
@@ -25,9 +25,10 @@ Tùy theo thực tế và nhu cầu sử dụng, cấu hình và các thông s�
 
 ✅ MySQL password: greenhat1998
 
-* Máy chấm từ xa (tạm gọi là Remote Judge) - Cài đặt 01 máy chấm và kết nối đến Local Server, áp dụng trong trường hợp bạn muốn tăng tốc độ chấm khi Local Server quá tải:
+* Máy chấm từ xa (tạm gọi là Remote Judge) - Cài đặt 01 máy chấm (judge03) và kết nối đến Local Server, áp dụng trong trường hợp bạn muốn tăng tốc độ chấm khi Local Server quá tải
   
 ✅ Ubuntu 20.04 Server/1 Core/2 GB RAM/60 GB SSD
+
 ✅ Username: judger
 
 ✅ IP: 192.168.1.16/24
@@ -61,124 +62,176 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io
 ```
 > Note: Hiện tại, chỉ có sudo mới có thể chạy các lệnh của Docker. Để các user khác cũng chạy được, cần thêm `sudo` vào trước các câu lệnh. Các lỗi như "docker: Got permission denied while trying to connect to the Docker daemon.." thường là do thiếu sudo trước câu lệnh.
 
-## Cài đặt Docker-Compose
-Tải binary chính thức từ github docker-compose (v1.29.2)
+### Cài đặt Docker-Compose
+> Có thể tham khảo thêm tại [Install the Compose plugin](https://docs.docker.com/compose/install/linux/)
+```
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-Thêm quyền thực thi cho file binary
 sudo chmod +x /usr/local/bin/docker-compose
-Cài đặt site
-Bước này chỉ thực hiện trên local server
-Tải về mã nguồn
+```
+## Cài đặt site
+Bước này chỉ cần thực hiện trên Local Server
+### Tải về mã nguồn
+```
 git clone --recursive https://github.com/VNOI-Admin/vnoj-docker.git
 cd vnoj-docker/dmoj
-Kể từ lúc này, các câu lệnh đằng sau sẽ giả định rằng thư mục hiện hành là /dmoj
-Cấu hình môi trường cho Docker
-Đây là bước sẽ thay đổi cấu hình cho server nhằm phù hợp hơn với mục đích cài đặt và tăng tính bảo mật cho server.
-Có 3 nơi mà bạn cần chỉnh sửa:
-dmoj/environment/
-Nơi này chứa các biến môi trường của server.
-Đổi tên các file .example tương ứng thành: mysql-admin.env, mysql.env, site.env
-1. mysql.env
+```
+Kể từ lúc này, các câu lệnh đằng sau sẽ có thư mục hiện hành là `/dmoj`
+### Cấu hình môi trường để sử dụng Docker
+Thay đổi các thông số cài đặt nhằm phù hợp với mục đích sử dụng và tăng tính bảo mật cho webserver.
+Có 3 nơi mà bạn có thể chỉnh sửa:
+1. `dmoj/environment/`
+
+Nơi này chứa các biến môi trường để build Docker image.
+> Note: Đổi tên các file .example tương ứng thành: mysql-admin.env, mysql.env, site.env
+* mysql.env
+```
 MYSQL_DATABASE=dmoj
 MYSQL_USER=dmoj
 MYSQL_PASSWORD=greenhat1998			#thay doi password
-2. mysql-admin.env
+```
+* mysql-admin.env
+```
 MYSQL_ROOT_PASSWORD=greenhat1998		#thay doi password
-3. site.env
-HOST=192.168.1.14					#thay bang IP cua server
+```
+* site.env
+```
+HOST=192.168.1.14				#thay bang IP cua Local Server
 SITE_FULL_URL=http://192.168.1.14/
 MEDIA_URL=http://192.168.1.14/
 DEBUG=0
-SECRET_KEY=abcdefghijklmnopqrstuvwxyz		#thay doi bang ma tuy y
-dmoj/nginx/conf.d/nginx.conf
-Cấu hình tên server_name thành 192.168.1.14
-dmoj/local_settings.py
-Thêm các thông tin cấu hình email để thực hiện xác thực tài khoản (có thể bỏ qua nếu không sử dụng tính năng này
-Thêm REGISTRATION_OPEN = True vào cuối file
-Build Docker Image
+SECRET_KEY=abcdefghijklmnopqrstuvwxyz		#thay doi bang ma khoa tuy y
+```
+2. `dmoj/nginx/conf.d/nginx.conf`
+
+Cấu hình hình tên server_name thành 192.168.1.14
+
+3. `dmoj/local_settings.py`
+
+Hầu hết các thông số đã được cấu hình sẵn. Nếu muốn thêm tính năng nào thì bỏ dấu comment tính năng đó. 
+
+Ví dụ: Để người dùng tự đăng ký tài khoản, tiến hành thêm các thông tin cấu hình email để thực hiện xác thực đăng ký tài khoản qua email (cần tạo mật khẩu ứng dụng cho email)
+
+### Build Docker Image
 Khởi tạo trước khi build
+```
 ./scripts/initialize
-Build image
+```
+Build Docker Image
+```
 sudo docker-compose build
-Khởi động thành phần site để cấu hình
+```
+Khởi động thành phần site để thực hiện cấu hình
+```
 sudo docker-compose up -d site
-Khởi tạo bảng cho Database
+```
+Khởi tạo dữ liệu cho Database
+```
 sudo ./scripts/migrate
+```
 Khởi tạo các file static
+```
 sudo ./scripts/copy_static
-Load dữ liệu cần thiết cho Website
+```
+Load các dữ liệu cần thiết cho Website
+```
 sudo ./scripts/manage.py loaddata navbar
 sudo ./scripts/manage.py loaddata language_small
 sudo ./scripts/manage.py loaddata demo
-Dữ liệu khởi tạo bao gồm:
-Highlight cho C++, Python,…
-Bài đăng "Hello World"
-Problem "A + B"
-Tài khoản superuser "admin":
-Username: admin
-Password: admin
-Khởi động VNOJ
-Quá trình cài đặt đã hoàn tất. Chạy câu lệnh bên dưới để khởi động tất cả các docker trong mạng lưới.
+```
+### Sử dụng VNOJ Site
+Quá trình cài đặt đến đây đã hoàn tất. Chạy câu lệnh bên dưới để khởi động tất cả các docker trong mạng lưới.
+```
 sudo docker-compose up –d
-Truy cập http://192.168.1.14 để kiểm tra kết quả.
+```
+Truy cập http://192.168.1.14 để kiểm tra kết quả (IP Local Server).
+
 Truy cập bài tập mẫu A+B và tiến hành upload testcase để kiểm tra.
-Cài đặt judge
+## Cài đặt judge
 Để đơn giản trong quá trình cài đặt, chúng ta sẽ tiếp tục cài đặt judge sử dụng Docker
-Note:
-	- Nếu judge chạy trên local server, không cần cài đặt lại docker.
-	- Nếu judge là remote judge, tiến hành cài đặt Docker theo hướng dẫn bên trên (không cần cài Docker-Compose)
-Thiết lập cấu hình judge trên admin site
+> Note:<br>
+	- Nếu cài đặt judge chạy trên Local Server, không cần cài đặt lại Docker.<br>
+	- Nếu cài đặt judge trên Remote Judge, tiến hành cài đặt Docker theo hướng dẫn bên trên (không cần cài Docker-Compose)
+> 
+### Thiết lập cấu hình judge trên admin site
 Truy cập http://192.168.1.14/admin/judge/
-Tạo các judge, lưu lại tên judge và key (ví dụ ở đây tạo 03 judge là judge01, judge02, judge03)
-Tạo môi trường biên dịch 
-Tải về môi trường biên dịch
+
+Tạo các judge, lưu lại tên judge id và key (ví dụ ở đây tạo 03 judge là judge01, judge02, judge03)
+### Tạo môi trường biên dịch 
+Tải về môi trường biên dịch (thực hiện trên Local Server và Remote Judge)
+```
 git clone https://github.com/VNOI-Admin/judge-server
 cd judge-server/.docker
 sudo apt install make
 sudo make judge-tiervnoj
-Có thể thay thế tiervnoj bằng tier1, tier2, tier3 (tier càng cao thì dung lượng càng lớn, tích hợp nhiều ngôn ngữ hơn).
-Tạo judge trên local server
-Tạo các file cấu hình tương ứng với mỗi judge có dạng là judge_name.yml (tên judge) và ghi những thông tin sau vào file:
+```
+Có thể thay thế `tiervnoj` bằng `tier1`, `tier2`, `tier3` (tier càng cao thì dung lượng càng lớn, càng được tích hợp nhiều ngôn ngữ hơn).
+
+### Tạo judge trên Local Server
+Tạo các file cấu hình tương ứng với mỗi judge có dạng là `judge_name.yml` (tên judge) và ghi những thông tin sau vào file:
+```
 id: <judge name>
 key: <judge authentication key>
 problem_storage_globs:
   - /problems/*
-Ở đây, ta sẽ chạy 2 máy chấm judge01 và judge02 trên local server
+```
+Ở đây, ta sẽ chạy 2 máy chấm `judge01` và `judge02` trên Local Server
+
 Build Docker Image
+```
 sudo docker run \
-    --name judge_name \
+    --name judge01 \
     --network="host" \
     -v /home/devsmile/vnoj-docker/dmoj/problems:/problems \
     --cap-add=SYS_PTRACE \
     -d \
     --restart=always \
     vnoj/judge-tiervnoj:latest \
-    run -p 9999 -c /problems/judge_name.yml 192.168.1.14 -A 0.0.0.0 -a 9111
-Note: 	- Thay thế judge_name, đường dẫn đến thư mục problem và IP tương ứng với thực tế
-		- Các judge chạy trên cùng local server phải có ID khác nhau (thay 9111 thành 9112, 9113, ...)
-- Để đảm bảo hệ thống hoạt động ổn định, theo quan điểm cá nhân của tôi, với máy local server có N core thì chỉ nên chạy N-1 judge.
-Tạo judge trên remote
-Tạo folder để mount dữ liệu từ local server
+    run -p 9999 -c /problems/judge01.yml 192.168.1.14 -A 0.0.0.0 -a 9111
+```
+> Note: <br>
+	- Với mỗi judge, cần thay thế judge01 (judge name), judge01.yml (judge config), 9111 (PID) tương ứng khác nhau.<br>
+	- Các judge chạy trên cùng Local Server phải có ID khác nhau (thay 9111 thành 9112, 9113, ...)
+
+### Tạo judge trên remote
+Tạo folder để mount dữ liệu từ thư mục `problems` trên Local Server
+```
 cd /home/judger
 mkdir problems
 sudo chmod 775 –R problems
-Mount folder problems trên local server về remote judge
+```
+Mount dữ liệu từ thư mục `problems` trên Local Server về thư mục `problems` vừa tạo trên Remote Judge
+```
 sudo apt install sshfs 
 sudo addgroup judger root
-sudo sshfs devsmile@192.168.1.14:/home/devsmile/vnoj-docker/dmoj/problems /home/judger/problems -o allow_other
+sudo sshfs devsmile@192.168.1.14:/home/devsmile/vnoj-docker/dmoj/problems /home/judger/problems -o allow_other		#IP và Username tren Local Server
 cd /home/judger/problems
+```
 Tạo file cấu hình tương ứng với judge có dạng là judge_name.yml (tên judge) và ghi những thông tin sau vào file:
+```
 id: <judge name>
 key: <judge authentication key>
 problem_storage_globs:
   - /home/judger/problems/*
+```
 Build Docker Image
+```
 sudo docker run \
-    --name judge_name \
+    --name judge03 \
     --network="host" \
     -v /home/judger/problems:/problems \
     --cap-add=SYS_PTRACE \
     -d \
     --restart=always \
     vnoj/judge-tiervnoj:latest \
-    run -p 9999 -c /home/judger/problems/judge_name.yml 192.168.1.14 -A 0.0.0.0 -a 9111
+    run -p 9999 -c /home/judger/problems/judge03.yml 192.168.1.14 -A 0.0.0.0 -a 9113
+```
+### Kiểm tra trạng thái của máy chấm
+Mở Docker logs để kiểm tra kết quả cài đặt Judge
+```
+sudo docker logs -ft judge01
+```
+Kiểm tra ở mục STATUS trên website để xem trạng thái kết nối của Judge đến Site. Sau đó thử nộp bài với các máy chấm khác nhau để kiểm tra kết quả.
+
+Chúc các bạn cài đặt thành công. From Greenhat with love!!!
+### Reach out to me 👓
+<a href="https://www.facebook.com/VietThienTran.301"><img src="https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes-2-free/128/social-facebook-2019-circle-512.png" width="32px" height="32px"> </a><a href="https://www.youtube.com/@vietthientran3140"><img src="https://cdn.icon-icons.com/icons2/1907/PNG/512/iconfinder-youtube-4555888_121363.png" width="32px" height="32px"></a>
