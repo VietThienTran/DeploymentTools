@@ -1,3 +1,7 @@
+# Install Qingdao Online Judge using Docker
+An open source online judge based on Vue, Django and Docker.
+https://qduoj.com
+
 ## Install Docker and Docker-Compose  
 ```
     sudo apt update
@@ -6,7 +10,6 @@
 ```
 ## Build Docker Container
 ```
-    wget https://raw.githubusercontent.com/VietThienTran/DeploymentTools/main/Qingdao%20Online%20Judge/docker-compose.yml
-    docker-compose up -d
+    wget https://raw.githubusercontent.com/VietThienTran/DeploymentTools/main/QingdaoOnlineJudge/docker-compose.yml
+    sudo docker-compose up -d
 ``` 
-# DONE!!!
