@@ -19,7 +19,7 @@ Tùy theo thực tế và nhu cầu sử dụng, cấu hình và các thông s�
 
 ✅ Username: devsmile
 
-✅ IP: 192.168.1.14/24
+✅ IP: 192.168.1.60/24
 
 ✅ Judgename: judge01, judge02
 
@@ -31,7 +31,7 @@ Tùy theo thực tế và nhu cầu sử dụng, cấu hình và các thông s�
 
 ✅ Username: judger
 
-✅ IP: 192.168.1.16/24
+✅ IP: 192.168.1.4/24
 
 ✅ Judgename: judge03
 
@@ -54,10 +54,10 @@ echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
 ```
 Install the Docker packages.
 ```
+sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io 
 ```
 > Note: Hiện tại, chỉ có sudo mới có thể chạy các lệnh của Docker. Để các user khác cũng chạy được, cần thêm `sudo` vào trước các câu lệnh. Các lỗi như "docker: Got permission denied while trying to connect to the Docker daemon.." thường là do thiếu sudo trước câu lệnh.
@@ -70,7 +70,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 ```
 ## Cài đặt site
 Bước này chỉ cần thực hiện trên Local Server
-### Tải về mã nguồn
+### Tải về mã nguồn VNOJ Docker
 ```
 git clone --recursive https://github.com/VNOI-Admin/vnoj-docker.git
 cd vnoj-docker/dmoj
@@ -95,15 +95,15 @@ MYSQL_ROOT_PASSWORD=greenhat1998		#thay doi password
 ```
 * site.env
 ```
-HOST=192.168.1.14				#thay bang IP cua Local Server
-SITE_FULL_URL=http://192.168.1.14/
-MEDIA_URL=http://192.168.1.14/
+HOST=192.168.1.60				#thay bang IP cua Local Server
+SITE_FULL_URL=http://192.168.1.60/
+MEDIA_URL=http://192.168.1.60/
 DEBUG=0
 SECRET_KEY=abcdefghijklmnopqrstuvwxyz		#thay doi bang ma khoa tuy y
 ```
 2. `dmoj/nginx/conf.d/nginx.conf`
 
-Cấu hình hình tên server_name thành 192.168.1.14
+Cấu hình hình tên server_name thành 192.168.1.60 hoặc domain name
 
 3. `dmoj/local_settings.py`
 
@@ -139,11 +139,11 @@ sudo ./scripts/manage.py loaddata language_small
 sudo ./scripts/manage.py loaddata demo
 ```
 ### Sử dụng VNOJ Site
-Quá trình cài đặt đến đây đã hoàn tất. Chạy câu lệnh bên dưới để khởi động tất cả các docker trong mạng lưới.
+Quá trình cài đặt đến đây đã hoàn tất. Chạy câu lệnh bên dưới để khởi động tất cả các docker container.
 ```
 sudo docker-compose up –d
 ```
-Truy cập http://192.168.1.14 để kiểm tra kết quả (IP Local Server).
+Truy cập http://192.168.1.60 để kiểm tra kết quả (IP Local Server).
 
 Truy cập bài tập mẫu A+B và tiến hành upload testcase để kiểm tra.
 ## Cài đặt judge
@@ -153,7 +153,7 @@ Truy cập bài tập mẫu A+B và tiến hành upload testcase để kiểm tr
 	- Nếu cài đặt judge trên Remote Judge, tiến hành cài đặt Docker theo hướng dẫn bên trên (không cần cài Docker-Compose)
 > 
 ### Thiết lập cấu hình judge trên admin site
-Truy cập http://192.168.1.14/admin/judge/
+Truy cập http://192.168.1.60/admin/judge/
 
 Tạo các judge, lưu lại tên judge id và key (ví dụ ở đây tạo 03 judge là judge01, judge02, judge03)
 ### Tạo môi trường biên dịch 
@@ -195,35 +195,34 @@ sudo docker run \
 ### Tạo judge trên remote
 Tạo folder để mount dữ liệu từ thư mục `problems` trên Local Server
 ```
-cd /home/judger
-mkdir problems
-sudo chmod 775 –R problems
+sudo mkdir -p /home/devsmile/vnoj-docker/dmoj/problems
+sudo chmod 775 –R /home/devsmile/vnoj-docker/dmoj/problems
 ```
 Mount dữ liệu từ thư mục `problems` trên Local Server về thư mục `problems` vừa tạo trên Remote Judge
 ```
 sudo apt install sshfs 
 sudo addgroup judger root
-sudo sshfs devsmile@192.168.1.14:/home/devsmile/vnoj-docker/dmoj/problems /home/judger/problems -o allow_other		#IP và Username tren Local Server
-cd /home/judger/problems
+sudo sshfs devsmile@192.168.1.14:/home/devsmile/vnoj-docker/dmoj/problems /home/devsmile/vnoj-docker/dmoj/problems -o allow_other		#IP và Username tren Local Server
+cd /home/devsmile/vnoj-docker/dmoj/problems
 ```
 Tạo file cấu hình tương ứng với judge có dạng là judge_name.yml (tên judge) và ghi những thông tin sau vào file:
 ```
 id: <judge name>
 key: <judge authentication key>
 problem_storage_globs:
-  - /home/judger/problems/*
+  - /problems/*
 ```
 Build Docker Image
 ```
 sudo docker run \
     --name judge03 \
     --network="host" \
-    -v /home/judger/problems:/problems \
+    -v /home/devsmile/vnoj-docker/dmoj/problems:/problems \
     --cap-add=SYS_PTRACE \
     -d \
     --restart=always \
     vnoj/judge-tiervnoj:latest \
-    run -p 9999 -c /home/judger/problems/judge03.yml 192.168.1.14 -A 0.0.0.0 -a 9113
+    run -p 9999 -c /home/devsmile/vnoj-docker/dmoj/problems/judge03.yml 192.168.1.60 -A 0.0.0.0 -a 9113
 ```
 ### Kiểm tra trạng thái của máy chấm
 Mở Docker logs để kiểm tra kết quả cài đặt Judge
