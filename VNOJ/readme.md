@@ -186,7 +186,7 @@ sudo docker run \
     -d \
     --restart=always \
     vnoj/judge-tiervnoj:latest \
-    run -p 9999 -c /problems/judge01.yml 192.168.1.14 -A 0.0.0.0 -a 9111
+    run -p 9999 -c /problems/judge01.yml 192.168.1.60 -A 0.0.0.0 -a 9111
 ```
 > Note: <br>
 	- Với mỗi judge, cần thay thế judge01 (judge name), judge01.yml (judge config), 9111 (PID) tương ứng khác nhau.<br>
@@ -231,6 +231,8 @@ sudo docker logs -ft judge01
 ```
 Kiểm tra ở mục STATUS trên website để xem trạng thái kết nối của Judge đến Site. Sau đó thử nộp bài với các máy chấm khác nhau để kiểm tra kết quả.
 
-Chúc các bạn cài đặt thành công. From Greenhat with love!!!
+Chúc các bạn thành công. 
+
+From Greenhat with love!!!
 ### Reach out to me 👓
 <a href="https://www.facebook.com/VietThienTran.301"><img src="https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes-2-free/128/social-facebook-2019-circle-512.png" width="32px" height="32px"> </a><a href="https://www.youtube.com/@vietthientran3140"><img src="https://cdn.icon-icons.com/icons2/1907/PNG/512/iconfinder-youtube-4555888_121363.png" width="32px" height="32px"></a>
