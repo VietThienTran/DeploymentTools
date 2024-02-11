@@ -195,15 +195,15 @@ sudo docker run \
 ### Tạo judge trên remote
 Tạo folder để mount dữ liệu từ thư mục `problems` trên Local Server
 ```
-sudo mkdir -p /home/devsmile/vnoj-docker/dmoj/problems
-sudo chmod 775 –R /home/devsmile/vnoj-docker/dmoj/problems
+mkdir -p /home/judger/problems
+sudo chmod 775 –R problems
 ```
 Mount dữ liệu từ thư mục `problems` trên Local Server về thư mục `problems` vừa tạo trên Remote Judge
 ```
 sudo apt install sshfs 
 sudo addgroup judger root
-sudo sshfs devsmile@192.168.1.14:/home/devsmile/vnoj-docker/dmoj/problems /home/devsmile/vnoj-docker/dmoj/problems -o allow_other		#IP và Username tren Local Server
-cd /home/devsmile/vnoj-docker/dmoj/problems
+sudo sshfs devsmile@192.168.1.60:/home/devsmile/vnoj-docker/dmoj/problems /home/judger/problems -o allow_other		#IP và Username tren Local Server
+cd /home/judger/problems
 ```
 Tạo file cấu hình tương ứng với judge có dạng là judge_name.yml (tên judge) và ghi những thông tin sau vào file:
 ```
@@ -217,12 +217,12 @@ Build Docker Image
 sudo docker run \
     --name judge03 \
     --network="host" \
-    -v /home/devsmile/vnoj-docker/dmoj/problems:/problems \
+    -v /home/judger/problems:/problems \
     --cap-add=SYS_PTRACE \
     -d \
     --restart=always \
-    vnoj/judge-tiervnoj:latest \
-    run -p 9999 -c /home/devsmile/vnoj-docker/dmoj/problems/judge03.yml 192.168.1.60 -A 0.0.0.0 -a 9113
+    vnoj/judge-tier1:latest \
+    run -p 9999 -c /problems/judge03.yml 192.168.1.60 -A 0.0.0.0 -a 9113
 ```
 ### Kiểm tra trạng thái của máy chấm
 Mở Docker logs để kiểm tra kết quả cài đặt Judge
