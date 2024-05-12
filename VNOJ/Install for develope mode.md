@@ -4,15 +4,38 @@ Hướng dẫn này được xây dựng dựa trên [tài liệu chính thức 
 
 > Các thông số đã được cấu hình tự động để quá trình cài đặt diễn ra nhanh hơn. Thông tin các file cấu hình có thể tham khảo [tại đây](https://github.com/VietThienTran/DeploymentTools/tree/main/VNOJ/sample-config)
 
+## Chuẩn bị môi trường cài đặt
+### Một số yêu cầu về hệ thống:
+
+✅ OS: Ubuntu 20.04 trở lên
+
+✅ Storage: 20 GB trở lên
+
+✅ CPU: 1 core trở lên
+
+✅ RAM: 1 GB trở lên
+
+Tùy theo thực tế và nhu cầu sử dụng, cấu hình và các thông số có thể thay đổi. Ở đây, mình sử dụng máy với cấu hình như sau: 
+
+✅ Ubuntu 22.04 Server/2 Core/4 GB RAM/30 GB SSD
+
+✅ Username: devsmile
+
+✅ IP: 192.168.1.17/24
+
+✅ Judgename: judge01
+
+✅ MySQL password: greenhat1998
+
 ## Cài đặt Site và Judge tự động - One-click deployment
 
 ```
 wget https://raw.githubusercontent.com/VietThienTran/DeploymentTools/main/VNOJ/sample-config/auto-install.sh
 bash auto-install.sh
 ```
-
 ## Khởi chạy hệ thống
-Chạy các lệnh sau theo thứ tự
+Mỗi lần khởi động hệ thống, tiến hành chạy các lệnh sau theo thứ tự
+
 ```
 cd ~
 . venv/bin/activate
