@@ -16,7 +16,6 @@ mariadb-tzinfo-to-sql /usr/share/zoneinfo | sudo mariadb -u root mysql
 # Install with virtual environment
 virtualenv venv
 . venv/bin/activate
-git clone --recursive https://github.com/VNOI-Admin/OJ site
 cd site
 pip3 install mysqlclient==2.1.1
 pip3 install lxml[html_clean]
@@ -24,9 +23,6 @@ pip3 install websocket-client
 pip3 install -r requirements.txt
 npm install
 mkdir problems media static
-cd dmoj
-wget https://raw.githubusercontent.com/VietThienTran/DeploymentTools/main/VNOJ/sample-config/local_settings.py
-cd ..
 ./make_style.sh
 python3 manage.py collectstatic
 python3 manage.py compilemessages
@@ -35,8 +31,5 @@ python3 manage.py migrate
 python3 manage.py loaddata navbar
 python3 manage.py loaddata language_small
 python3 manage.py loaddata demo
-cd problems
-wget https://raw.githubusercontent.com/VietThienTran/DeploymentTools/main/VNOJ/sample-config/judge01.yml
-cd ..
 python3 manage.py addjudge judge01 "abcdefghijklmnopqrstuvwxyz"
 pip3 install dmoj
