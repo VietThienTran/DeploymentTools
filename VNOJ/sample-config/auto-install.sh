@@ -18,9 +18,9 @@ virtualenv venv
 . venv/bin/activate
 cd site
 pip3 install mysqlclient==2.1.1
-pip3 install lxml[html_clean]
 pip3 install websocket-client
 pip3 install -r requirements.txt
+pip3 install lxml_html_clean
 npm install
 mkdir problems media static
 ./make_style.sh
