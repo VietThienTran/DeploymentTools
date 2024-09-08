@@ -21,29 +21,37 @@ Tùy theo thực tế và nhu cầu sử dụng, cấu hình và các thông s�
 
 ✅ Username: devsmile
 
-✅ IP: 192.168.1.17/24
+✅ IP: 192.168.1.19/24
 
 ✅ Judgename: judge01
 
 ✅ MySQL password: greenhat1998
 
-## Cài đặt Site và Judge tự động - One-click deployment
-Tải về file cài đặt tự động và các file cấu hình mẫu.
+## Cài đặt Site tự động - One-click deployment
+Download mã nguồn VNOJ
+```
+git clone --recursive https://github.com/VNOI-Admin/OJ site
+```
+Tạo file **local_settings.py** để lưu các thông số cấu hình của hệ thống
+```
+cd site/dmoj
+wget https://raw.githubusercontent.com/VietThienTran/DeploymentTools/main/VNOJ/sample-config/local_settings.py
+```
+> Sửa đổi tên user tương ứng và cấu hình lại email để xác thực đăng ký tài khoản
+
+Quá trình chuẩn bị đã hoàn tất. Khởi chạy script để cài đặt tự động
 ```
 wget https://raw.githubusercontent.com/VietThienTran/DeploymentTools/main/VNOJ/sample-config/auto-install.sh
-wget https://raw.githubusercontent.com/VietThienTran/DeploymentTools/main/VNOJ/sample-config/local_settings.py
-wget https://raw.githubusercontent.com/VietThienTran/DeploymentTools/main/VNOJ/sample-config/judge01.yml
-```
-Thay thế một số thông số cho phù hợp với hệ thống.
-- User Ubuntu
-- Password mysql
-- Secret key (file local_settings.py)
-- Judge key (file auto-install.sh và judge01.yml)
-
-Khởi chạy script cài đặt tự động
-```
 bash auto-install.sh
 ```
+## Tạo Judge kết nối đến site
+```
+. venv/bin/activate
+cd site/problems
+wget https://raw.githubusercontent.com/VietThienTran/DeploymentTools/main/VNOJ/sample-config/judge01.yml
+dmoj-autoconf
+```
+Copy các dòng sau _runtime_ và thêm vào cuối file **judge01.yml** và lưu lại
 
 ## Khởi chạy hệ thống
 Mỗi lần khởi động hệ thống, tiến hành chạy các lệnh sau theo thứ tự
