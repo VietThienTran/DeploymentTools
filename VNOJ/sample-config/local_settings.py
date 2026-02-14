@@ -110,7 +110,7 @@ ADMINS = (
 )
 
 # The sender for the aforementioned emails.
-SERVER_EMAIL = 'DMOJ: Modern Online Judge <errors@dmoj.ca>'
+SERVER_EMAIL = 'DMOJ Modern Online Judge <errors@dmoj.ca>'
 
 
 ################################################
